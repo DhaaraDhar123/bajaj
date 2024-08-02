@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Input Application</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+    
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+    
+        form {
+            margin-bottom: 20px;
+        }
+    
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    
+        button:hover {
+            background-color: #45a049;
+        }
+    
+        .card {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    
+        .card p {
+            margin: 5px 0;
+        }
+    
+        .card p strong {
+            color: #333;
+        }
+    
+        #filter-form {
+            margin-bottom: 20px;
+        }
+    
+        #filter-form label {
+            display: block;
+            margin-bottom: 10px;
+        }
+    
+        #results {
+            font-weight: bold;
+        }
+    </style>
+    
+</head>
+<body>
+    <h1>JSON Input Application</h1>
+    
+    <form id="json-form" method="POST" action="/submit">
+        <label for="json-input">Enter JSON:</label><br>
+        <textarea id="json-input" name="jsonInput" rows="5" cols="50" placeholder='{"data": ["A","C","z"]}'><%= jsonData ? JSON.stringify(jsonData) : '' %></textarea><br><br>
+        <button type="submit">Submit</button>
+    </form>
+    
+    <h2>Filter Options:</h2>
+    <form id="filter-form">
+        <label>
+            <input type="checkbox" name="filter" value="numbers"> Only Numbers
+        </label><br>
+        <label>
+            <input type="checkbox" name="filter" value="alphabets"> Only Alphabets
+        </label><br>
+        <label>
+            <input type="checkbox" name="filter" value="highest-alphabet"> Highest Alphabet
+        </label><br>
+        <label>
+            <input type="checkbox" name="filter" value="highest-number"> Highest Number
+        </label><br><br>
+        
+        <button type="button" onclick="applyFilter()">Apply Filter</button>
+    </form>
+    
+    <div class="card" id="filter-results">
+        <h3>Filter Results:</h3>
+        <% if (jsonData && !jsonData.error) { %>
+            <p><strong>Success:</strong> true</p>
+            <p><strong>Registration ID:</strong> AP21110011537</p>
+            <p><strong>Gmail:</strong>dhaaradharreddy_s@srmap.edu.in</p>
+            <p><strong>Username:</strong>dhaaradharreddy_19052003</p>
+            <p><strong>Number Array:</strong> <%= jsonData.data.filter(item => !isNaN(item)) %></p>
+            <p><strong>Alphabet Array:</strong> <%= jsonData.data.filter(item => isNaN(item)) %></p>
+            <p><strong>Highest Alphabet:</strong> <%= jsonData.data.filter(item => isNaN(item)).sort().reverse()[0] %></p>
+        <% } else { %>
+            <p id="results">No results to show.</p>
+        <% } %>
+    </div>
+    
+    
+    <script>
+        function applyFilter() {
+            const filters = document.querySelectorAll('input[name="filter"]:checked');
+            const jsonInput = document.getElementById('json-input').value;
+            const data = JSON.parse(jsonInput).data;
+            let filteredData = data;
+
+            filters.forEach(filter => {
+                switch (filter.value) {
+                    case 'numbers':
+                        filteredData = filteredData.filter(item => !isNaN(item));
+                        break;
+                    case 'alphabets':
+                        filteredData = filteredData.filter(item => isNaN(item));
+                        break;
+                    case 'highest-alphabet':
+                        filteredData = [filteredData.filter(item => isNaN(item)).sort().reverse()[0]];
+                        break;
+                    case 'highest-number':
+                        filteredData = [Math.max(...filteredData.filter(item => !isNaN(item)))];
+                        break;
+                }
+            });
+            document.getElementById('results').textContent = `Result: ${filteredData}`;
+        }
+    </script>
+</body>
+</html>
